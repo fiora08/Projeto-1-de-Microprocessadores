@@ -255,19 +255,6 @@ unsigned char vendas(unsigned char tecla, char buffer[])
 
 				if(estado_venda == RESPOSTA)
 				{
-					lcd_posicionar(1, 0);
-					lcd_caractere(buffer[0]);
-
-					lcd_posicionar(1, 1);
-					lcd_caractere(buffer[1]);
-					lcd_posicionar(1, 2);
-					lcd_caractere(buffer[2]);
-					lcd_posicionar(1, 3);
-					lcd_caractere(buffer[3]);
-					lcd_posicionar(1, 4);
-					lcd_caractere(buffer[4]);
-					lcd_posicionar(1, 5);
-					lcd_caractere(buffer[5]);
 					if(buffer[0] == 'S' && buffer[1] == 'P' && buffer[2] == 'V'||
 						buffer[0] == 'S' && buffer[1] == 'V' && buffer[2] == 'V') //strncmp(buffer, "SVV", 3) == 0 || strncmp(buffer, "SPV", 3) == 0
 					{
