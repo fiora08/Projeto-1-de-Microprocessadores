@@ -68,6 +68,8 @@ int main(void) {
 	// junto com as outras variáveis, antes do while
 	unsigned char menu_estado = MENU_PRINCIPAL;
 	unsigned char menu_desenhado = 0;
+    unsigned char adm = 1;
+    char buffer[20];
 
 
 while (1) {
@@ -78,6 +80,18 @@ while (1) {
             teclado_atualizar();
             tecla = teclado_obter_tecla();
 
+			//maquina_protocolo();
+            //strcpy(buffer, protocolo_get_mensagem());
+            maquina_protocolo();
+            char* msg = protocolo_get_mensagem();
+
+            // Só atualiza o buffer se tiver conteúdo novo
+            if(strlen(msg) > 0) {
+                if(strcmp(buffer,msg) != 0){
+                    memset(buffer, '\0', sizeof(buffer));
+                    strcpy(buffer, msg);
+                }
+            }
           //menu conjunto
             if (menu_estado == MENU_PRINCIPAL) {
                 if (!menu_desenhado) {
@@ -93,10 +107,11 @@ while (1) {
                 }
 
                 if (tecla == '1') {
-                    menu_estado = MENU_PRINCIPAL;
+                    menu_estado = MENU_VENDAS;
                     serial_escrever("vendas ");
                     menu_desenhado = 0;
                     lcd_limpar();
+					tecla = 0; // ← consome a tecla aqui, vendas() receberá 0
                 }
                 if (tecla == '2') {
                     menu_estado = MENU_PRINCIPAL;
@@ -114,16 +129,14 @@ while (1) {
                 }
             }
 
-/*
-=========================================================================
             //venda
             if (menu_estado == MENU_VENDAS) {
-                if (vendas(menu_desenhado == 0)) {
-                    // venda finalizada, volta ao menu
-                    menu_estado = MENU_PRINCIPAL;
-                    menu_desenhado = 0;
-                }
                 menu_desenhado = 1;
+                // venda finalizada, volta ao menu
+				if(vendas(tecla, buffer) == 1){
+                    menu_estado = MENU_PRINCIPAL;
+                    //menu_desenhado = 0;					
+				}
             }
             
 
@@ -135,8 +148,6 @@ while (1) {
                     menu_desenhado = 0;
                 }
             }
-======================================================
-*/
 
             //entra no menu admin
             if (menu_estado == MENU_ADMIN) {
@@ -454,7 +465,7 @@ return 0;
 
 
 
-while (1) {
+/*while (1) {
     energia_gerenciar();
     if (energia_sistema_ativo() == LIGADO) {
         teclado_atualizar();
