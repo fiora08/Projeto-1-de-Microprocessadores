@@ -28,5 +28,5 @@ typedef struct venda {
 } venda;
 
 extern venda n_vendas[5];
-unsigned char vendas(unsigned char inicio);
+unsigned char vendas(unsigned char tecla, char buffer[]);
 #endif
