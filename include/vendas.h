@@ -12,6 +12,8 @@
 #define SEN_CARTAO 9
 #define DEBITO 10
 #define CREDITO 11
+#define ENVIAR 12
+#define RESPOSTA 13
 
 
 typedef struct venda {
@@ -20,7 +22,7 @@ typedef struct venda {
     unsigned char num_parcelas;
     unsigned int opcao_venda;
     unsigned char bandeira;
-    unsigned char num_cartao[7];
+    char num_cartao[7];
     unsigned char senha_cartao[7];
     unsigned int codigo;
 } venda;

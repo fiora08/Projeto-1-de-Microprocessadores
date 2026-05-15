@@ -14,9 +14,11 @@
 #include "interface.h"
 #include "senhas.h"
 #include "vendas.h"
+#include "maquina_protocolo.h"
 
 //  Variáveis internas
 static unsigned char tecla;
+static unsigned char tecla_twin;
 static unsigned char ind_vds = 0;
 static unsigned char ind_val = 0;
 static unsigned char ind_num = 0;
@@ -25,13 +27,18 @@ static unsigned char inc_cod = 0;
 static unsigned char cont_D = 0;
 static unsigned char qual_venda;
 static unsigned char estado_venda = TIPO;
+static  char buffer[20];
 venda n_vendas[5];
 
-unsigned char vendas(unsigned char inicio){
+unsigned char vendas(unsigned char inicio)
+{
 	
 	if(estado_atual == DESBLOQUEADO)
 	{
+		strcpy(buffer, protocolo_get_mensagem());
+		
 		tecla = teclado_obter_tecla();
+		tecla_twin = teclado_ler_bruto();
 		// Limpar a tela na MAIN
 		if(inicio == 1)
 		{
@@ -175,24 +182,37 @@ unsigned char vendas(unsigned char inicio){
 						lcd_posicionar(0, 0);
 						lcd_escrever_string("N.CARTAO:");
 					}
-
-				if(estado_venda == NUM_CARTAO && tecla != 0)
-				{
-					if (ind_num < 6 && tecla != 'D') {
-						n_vendas[ind_vds].num_cartao[ind_num] = tecla;
-						lcd_caractere(tecla);
-						ind_num++;
-					}else if (tecla == 'D' &&  ind_num == 6)
+				// NÚMERO DO CARTÃO
+				if(estado_venda == NUM_CARTAO && ( tecla != 0 || strlen(buffer) > 1) ) 
+				{		
+					if(ind_num < 6 && strlen(buffer) == 16)
+					{
+						n_vendas[ind_vds].num_cartao[ind_num] = buffer[ind_num+4];
+						lcd_caractere(n_vendas[ind_vds].num_cartao[ind_num]);	
+						ind_num++;	
+						if(ind_num == 6) serial_escrever("MW");					
+					}else if(ind_num < 6 && strlen(buffer) == 10)
 						{
-							// Caso CONFIRMA - tecla D - for apertado sai do estado VALOR e finaliza o vetor numero do cartão
-							estado_venda = SEN_CARTAO; 
-							n_vendas[ind_vds].num_cartao[ind_num] = '\0';
-							ind_num = 0;
-							lcd_limpar();
-							//Ler a opção de compra
-							lcd_posicionar(0, 0);
-							lcd_escrever_string("Senha:");	
-						}
+							n_vendas[ind_vds].num_cartao[ind_num] = buffer[ind_num+4];
+							lcd_caractere(n_vendas[ind_vds].num_cartao[ind_num]);	
+							ind_num++;
+							if(ind_num == 6) serial_escrever("MM");							
+						}else if (ind_num < 6 && tecla != 'D' && tecla != 0) 
+							{
+								n_vendas[ind_vds].num_cartao[ind_num] = tecla;
+								lcd_caractere(tecla);
+								ind_num++;
+							}else if (tecla == 'D' &&  ind_num == 6)
+								{
+									// Caso CONFIRMA - tecla D - for apertado sai do estado VALOR e finaliza o vetor numero do cartão
+									estado_venda = SEN_CARTAO; 
+									n_vendas[ind_vds].num_cartao[ind_num] = '\0';
+									ind_num = 0;
+									lcd_limpar();
+									//Ler a opção de compra
+									lcd_posicionar(0, 0);
+									lcd_escrever_string("Senha:");	
+								}
 				}
 
 				if(estado_venda == SEN_CARTAO && tecla != 0)
@@ -204,22 +224,71 @@ unsigned char vendas(unsigned char inicio){
 					}else if(ind_sen == 6 && tecla == 'D')
 						{
 							// Caso o CONFIRMA - tecla D - for apertado sai do estado VALOR e finaliza o vetor numero do cartão
-							estado_venda = TIPO; 
+							estado_venda = ENVIAR; 
 							n_vendas[ind_vds].senha_cartao[ind_sen] = '\0';
 							ind_sen = 0;
+							//qual_venda = 0;	
+							//ind_vds++;
+							//if(ind_vds > 4)	ind_vds = 0;
 							lcd_limpar();
-							qual_venda = 0;	
-							ind_vds++;
-							if(ind_vds > 4)	ind_vds = 0;
-							lcd_limpar();
-							lcd_posicionar(0, 4);
-							lcd_escrever_string("Compra");
-							lcd_posicionar(1, 2);
-							lcd_escrever_string("Finalizada!");
-							return 1;
+							//lcd_posicionar(0, 4);
+							//lcd_escrever_string("Compra");
+							//lcd_posicionar(1, 2);
+							//lcd_escrever_string("Finalizada!");
 						}
 				}
 
+				if(estado_venda == ENVIAR)
+				{
+					if(qual_venda == VENDA_VISTA)
+					{
+						enviar_venda(n_vendas[ind_vds].bandeira, n_vendas[ind_vds].num_cartao, n_vendas[ind_vds].senha_cartao, n_vendas[ind_vds].valor_venda);
+					}else 
+						{
+							enviar_venda_parcelada(n_vendas[ind_vds].bandeira, n_vendas[ind_vds].num_cartao, n_vendas[ind_vds].senha_cartao, n_vendas[ind_vds].num_parcelas, n_vendas[ind_vds].valor_venda);
+						}
+					qual_venda = 0;
+					ind_vds++;
+					if(ind_vds > 4)	ind_vds = 0;
+					estado_venda = RESPOSTA;
+				}
+
+				if(estado_venda == RESPOSTA)
+				{
+					if(strcmp(buffer, "SVV") == 0 || strcmp(buffer, "SPV") == 0)
+					{
+						lcd_posicionar(0, 0);
+        				lcd_escrever_string("Venda realizada");
+						lcd_posicionar(1, 2);
+        				lcd_escrever_string("com sucesso");
+						estado_venda = TIPO;
+						return 1;
+					}else if(strcmp(buffer, "SVC") == 0 || strcmp(buffer, "SPV") == 0)
+						{
+        					lcd_posicionar(0, 0);
+        					lcd_escrever_string("Cartao com falha");
+							lcd_posicionar(1, 3);
+        					lcd_escrever_string("(invalida)");	
+							estado_venda = TIPO;
+							return 1;						
+						}else if(strcmp(buffer, "SVS") == 0 || strcmp(buffer, "SPS") == 0)
+							{
+        						lcd_posicionar(0, 0);
+        						lcd_escrever_string("Senha com falha");
+								lcd_posicionar(1, 3);
+        						lcd_escrever_string("(invalida)");	
+								estado_venda = TIPO;
+								return 1;						
+							}else if(strcmp(buffer, "SVI") == 0 || strcmp(buffer, "SPI") == 0)
+								{
+        							lcd_posicionar(0, 4);
+        							lcd_escrever_string("Saldo");
+									lcd_posicionar(1, 2);
+        							lcd_escrever_string("Insuficiente");	
+									estado_venda = TIPO;
+									return 1;						
+								}
+				}
 				return 0;
 	}
 	return 0;

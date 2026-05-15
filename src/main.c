@@ -418,6 +418,63 @@ return 0;
 			sistema_ja_ligado = 2;
 			estado_atual = BLOQUEADO;
 		}
+		
+		
+
+
+
+        if (estado_atual == BLOQUEADO && sistema_ja_ligado ==2  ) {
+            unsigned char usuario_autenticado;
+            mascara_autentica_senha(novo_usuario, 4, &usuario_autenticado);
+			inicia = 1;
+        }
+        if (estado_atual == DESBLOQUEADO) {
+			vendas(inicia); 
+			inicia = 0;
+            tecla = teclado_obter_tecla();
+            if (tecla != 0) {
+                lcd_caractere(tecla);
+            }
+        }
+    }
+	flag_1ms=0;
+}
+
+
+return 0;
+
+
+}*/
+
+
+
+
+
+
+
+
+
+while (1) {
+    energia_gerenciar();
+    if (energia_sistema_ativo() == LIGADO) {
+        teclado_atualizar();
+
+		
+		if (sistema_ja_ligado == 0) {
+			lcd_limpar();
+			lcd_posicionar(0, 2);
+			lcd_escrever_string("MicPay 2026");
+			lcd_posicionar(1, 1);
+			lcd_escrever_string("Sistema Ativo");
+			sistema_ja_ligado = 1;
+		}
+		if (sistema_ja_ligado == 1 && tempo_n_bloqueante(1500)) {
+			lcd_limpar();
+			lcd_posicionar(0, 0);
+			lcd_escrever_string("Bloqueado:");
+			sistema_ja_ligado = 2;
+			estado_atual = BLOQUEADO;
+		}
 	
         if (estado_atual == BLOQUEADO && sistema_ja_ligado ==2  ) {
             mascara_autentica_senha(novo_usuario, 4, &usuario_autenticado);
