@@ -158,62 +158,7 @@ unsigned char alterar_dia(unsigned char tecla){
     }
     return 0;
 }
-/*unsigned char alterar_hora(unsigned char tecla) {
-    static unsigned char pos = 0;
-    static unsigned char valor = 0;
-    //unsigned char tecla = teclado_obter_tecla();
-    
-    if (tecla != 0 && tecla != '#') {
-		lcd_posicionar(1, 0);
-        valor = valor * 10 + (tecla - '0');
-        pos++;
-        lcd_caractere(tecla);
-    }
-    if (tecla == '#' || pos == 2) {
-        if (pos>0 && valor <= 23) {
-			h = valor;
-			valor = 0;
-			return 1;
-		} else if (pos > 0) {
-			lcd_posicionar(1, 0);
-			lcd_escrever_string("Val.invalido!   ");
-			valor = 0;
-			pos = 0;
-			return 0;
-		}
-        valor = 0;
-        pos = 0;
-        return 1;
-    }
-    return 0;
-}*/
 
-/*unsigned char alterar_minuto(unsigned char tecla) {
-    static unsigned char pos = 0;
-    static unsigned char valor = 0;
-    //unsigned char tecla = teclado_obter_tecla();
-    
-    if (tecla != 0 && tecla != '#') {
-		lcd_posicionar(1, 0);
-        valor = valor * 10 + (tecla - '0');
-        pos++;
-        lcd_caractere(tecla);
-    }
-    if (tecla == '#' || pos == 2) {
-        if (pos>0 && valor <= 59) {
-			min = valor;
-			valor = 0;
-			return 1;
-		} else if (pos > 0) {
-        lcd_posicionar(1, 0);
-        lcd_escrever_string("Val.invalido!   ");
-		}
-        valor = 0;
-        pos = 0;
-        return 1;
-    }
-    return 0;
-}*/
 unsigned char alterar_hora(unsigned char tecla) {
     static unsigned char pos = 0;
     static unsigned char valor = 0;

@@ -17,6 +17,8 @@
 #include "protocolo.h"
 #include "login.h"
 #include "admin.h"
+#include "estorno.h"
+
 
 
 unsigned char usuario_autenticado = 0;
@@ -38,7 +40,7 @@ int main(void) {
 	lcd_inicializar();
 	energia_inicializar();
 	
-	sei(); // Habilita interrup��es
+	sei(); // Habilita interrup  es
 
 	//inicialização dos usuários 
 	usuario  novo_usuario[3];
@@ -56,8 +58,6 @@ int main(void) {
 	strcpy(novo_usuario[2].senha , "0738");
 	novo_usuario[2].habilitado = 1;
 
-	strcpy(cartao_local[0].numero_cartao, "123456");
-	cartao_local[0].saldo = 800;
 
 	unsigned char tecla=0;
 	char buffer_lcd[17]; // 16 caracteres + '\0'
@@ -68,7 +68,7 @@ int main(void) {
 	// junto com as outras variáveis, antes do while
 	unsigned char menu_estado = MENU_PRINCIPAL;
 	unsigned char menu_desenhado = 0;
-    unsigned char adm = 1;
+    unsigned char num_cartoes = 0;
     char buffer[20];
 
 
@@ -80,8 +80,7 @@ while (1) {
             teclado_atualizar();
             tecla = teclado_obter_tecla();
 
-			//maquina_protocolo();
-            //strcpy(buffer, protocolo_get_mensagem());
+            //func_test(); 
             maquina_protocolo();
             char* msg = protocolo_get_mensagem();
 
@@ -92,16 +91,19 @@ while (1) {
                     strcpy(buffer, msg);
                 }
             }
-          //menu conjunto
+
+         //menu conjunto
             if (menu_estado == MENU_PRINCIPAL) {
                 if (!menu_desenhado) {
                     lcd_limpar();
                     if (usuario_autenticado == 2) {
                         lcd_escrever_string("1-Vend 2-Est");
                         lcd_posicionar(1, 0);
-                        lcd_escrever_string("3-Adm");
+                        lcd_escrever_string("3-Adm 4-CL 5- VL");
                     } else {
-                        lcd_escrever_string("1-Vend 2-Est");
+                        lcd_escrever_string("1-Vend 2-Est ");
+                        lcd_posicionar(1, 0);
+                        lcd_escrever_string("4- CL 5- VL");
                     }
                     menu_desenhado = 1;
                 }
@@ -114,7 +116,7 @@ while (1) {
 					tecla = 0; // ← consome a tecla aqui, vendas() receberá 0
                 }
                 if (tecla == '2') {
-                    menu_estado = MENU_PRINCIPAL;
+                    menu_estado = MENU_ESTORNO;
                     serial_escrever("estorno ");
                     menu_desenhado = 0;
                     lcd_limpar();
@@ -127,6 +129,25 @@ while (1) {
                     menu_desenhado = 0;
                     lcd_limpar();
                 }
+
+                if (tecla == '4') {
+                    num_cartoes = cadastrar_cartao_local(cartao_local, num_cartoes);
+                    serial_escrever(cartao_local[num_cartoes-1].numero_cartao);
+                    serial_escrever(" ");
+                    serial_escrever(cartao_local[num_cartoes-1].senha_cartao);
+                    serial_escrever(" saldo");
+                    
+                    menu_estado = MENU_PRINCIPAL;
+                    menu_desenhado = 0;
+}
+
+                if(tecla == '5'){
+
+                    venda_local(
+                        cartao_local,
+                        num_cartoes);
+                        menu_estado = MENU_PRINCIPAL;
+                }                
             }
 
             //venda
@@ -134,8 +155,9 @@ while (1) {
                 menu_desenhado = 1;
                 // venda finalizada, volta ao menu
 				if(vendas(tecla, buffer) == 1){
+                    atraso_ms(1500);
                     menu_estado = MENU_PRINCIPAL;
-                    //menu_desenhado = 0;					
+                    menu_desenhado = 0;					
 				}
             }
             
@@ -143,10 +165,10 @@ while (1) {
             
             //vai pro estorno
             if (menu_estado == MENU_ESTORNO) {
-                if (estorno_executar(novo_usuario)) {
+                 estorno_executar(novo_usuario);
                     menu_estado = MENU_PRINCIPAL;
                     menu_desenhado = 0;
-                }
+                
             }
 
             //entra no menu admin
@@ -156,6 +178,15 @@ while (1) {
                     menu_desenhado = 0;
                 }
             }
+
+            /*if(n_vendas[main_vd].tipo == parcelada)
+            {
+                if(n_vendas[main_vd].data < mes)
+                {
+
+                        verificar_parcelas();  
+                }
+            }*/
 
         } else {
             // sistema bloqueado ou desligado: reseta menu

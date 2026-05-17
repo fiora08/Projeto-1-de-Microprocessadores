@@ -25,8 +25,10 @@ typedef struct venda {
     char num_cartao[7];
     unsigned char senha_cartao[7];
     unsigned int codigo;
+    unsigned int data;
 } venda;
 
 extern venda n_vendas[5];
 unsigned char vendas(unsigned char tecla, char buffer[]);
+void func_test();
 #endif

@@ -50,4 +50,75 @@ void verificar_parcelas(void) {
         if (h == 22) ja_tentou_22h = 1;
     }
 }
+/*
+void listar_parcelas(void) {
+    if (qtd_parcelas == 0) {
+        lcd_limpar();
+        lcd_escrever_string("Sem parcelas");
+        atraso_ms(500);
+        return;
+    }
+
+    for (int j = 0; j < qtd_parcelas; j++) {
+        unsigned char idx = ind_parcelas[j];
+        char buf[8];
+
+        lcd_limpar();
+        lcd_escrever_string("Cod:");
+        lcd_caractere(n_vendas[idx].codigo);
+
+        lcd_posicionar(1, 0);
+        lcd_escrever_string("Parc:");
+        lcd_caractere(n_vendas[idx].num_parcelas);
+
+        atraso_ms(500);
+    }
+    for (int j = 0; j < qtd_parcelas; j++) {
+    unsigned char idx = ind_parcelas[j];
+    char buf[8];
+
+    lcd_limpar();
+    lcd_escrever_string("Cod:");
+    sprintf(buf, "%d", n_vendas[idx].valor_venda);
+    lcd_escrever_string(buf);
+
+    lcd_posicionar(1, 0);
+    lcd_escrever_string("Parc:");
+    sprintf(buf, "%d", n_vendas[idx].num_parcelas);
+    lcd_escrever_string(buf);
+
+    atraso_ms(500);
+}
+}*/
+
+void listar_parcelas() {
+    if (qtd_parcelas == 0) {
+        lcd_limpar();
+        lcd_escrever_string("Sem parcelas");
+        atraso_ms(2000);
+        return;
+    }
+
+    for (int j = 0; j < qtd_parcelas; j += 2) {
+        char buf[17];
+        lcd_limpar();
+
+        lcd_posicionar(0, 0);
+        sprintf(buf, "Cod:%-2d  Parc:%-2d",
+                n_vendas[ind_parcelas[j]].codigo,
+                n_vendas[ind_parcelas[j]].num_parcelas);
+        lcd_escrever_string(buf);
+
+        if (j + 1 < qtd_parcelas) {
+            lcd_posicionar(1, 0);
+            sprintf(buf, "Cod:%-2d  Parc:%-2d",
+                    n_vendas[ind_parcelas[j+1]].codigo,
+                    n_vendas[ind_parcelas[j+1]].num_parcelas);
+            lcd_escrever_string(buf);
+        }
+
+        atraso_ms(3000);
+    }
+
+    lcd_limpar();
 }

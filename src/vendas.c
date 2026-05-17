@@ -283,8 +283,13 @@ unsigned char vendas(unsigned char tecla, char buffer[])
         						lcd_escrever_string("Senha com falha");
 								lcd_posicionar(1, 3);
         						lcd_escrever_string("(invalida)");	
-								estado_venda = TIPO;
-								return 1;						
+								estado_venda = SEN_CARTAO;
+								//limpou_tela = 0;
+								atraso_ms(500);
+								lcd_limpar();
+								lcd_posicionar(0, 0);
+									lcd_escrever_string("Senha:");
+														
 							}else if(buffer[0] == 'S' && buffer[1] == 'V' && buffer[2] == 'I'||
 									buffer[0] == 'S' && buffer[1] == 'P' && buffer[2] == 'I')
 								{	
