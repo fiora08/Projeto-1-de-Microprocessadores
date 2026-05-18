@@ -10,7 +10,7 @@ volatile unsigned char flag_1ms = 0;
 volatile unsigned char flag_2s = 0;
 volatile unsigned int contador_serial = 0;
 volatile unsigned long contador_timeout = 0;
-volatile int dia=0, mes= 0, ano=0,h = 0, min = 0, seg = 0;
+volatile int dia=01, mes= 01, ano=2026,h = 0, min = 0, seg = 0;
 // inicializa�a� retirada de um laboratorio. 
 // pre escala 64 
 void timer0_init(void){
@@ -52,6 +52,10 @@ ISR(TIMER1_COMPA_vect) {
 				min = 0;
 				if (++h >= 24)
 				 h = 0;
+                    if(++dia >= 31)
+                        dia = 1;
+                        if(++mes >= 12)
+                            mes = 1;
 			}
 		}
 	}

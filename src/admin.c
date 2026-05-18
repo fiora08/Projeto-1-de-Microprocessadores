@@ -19,12 +19,14 @@
 #include "protocolo.h"
 #include "login.h"
 #include "admin.h"
+#include "venda_agendada.h"
 
 
 unsigned char menu_admin(unsigned char tecla, usuario *usuarios) {
     static unsigned char mostrando_msg = 0;
     static unsigned char no_menu = 0;
     static unsigned char entrou_menu_hora = 0;
+    static unsigned char entrou_menu_pendencias = 0;
     
     if (mostrando_msg) {
         if (tempo_n_bloqueante(1500)) {
@@ -61,6 +63,8 @@ unsigned char menu_admin(unsigned char tecla, usuario *usuarios) {
                 ultimo_seg = seg;
                 lcd_posicionar(0, 0);
                 mostrar_hora();
+                lcd_posicionar(1, 0);
+                mostrar_data();                
             }
             return 0;
     
@@ -106,13 +110,18 @@ unsigned char menu_admin(unsigned char tecla, usuario *usuarios) {
        break;
         
     
+        case '4': 
+        //alteração de hora
+       entrou_menu_pendencias = 1;
+       lcd_limpar();
+       tecla=0;
+       verificar_parcelas();
+       listar_parcelas();
+       break;
 
-
-
-
-    }
-
-    
+       case '5':
+       break;
+        }
     if (tecla == '*') {
         no_menu = 0;
         entrou_menu_hora = 0;

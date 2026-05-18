@@ -17,9 +17,9 @@
 #include "maquina_protocolo.h"
 
 //  Variáveis internas
-static unsigned char ind = 0;
 static unsigned char start = 1;
-static unsigned char ind_vds = 0;
+static unsigned char limpou_tela = 0;
+static unsigned char ind_vds = 2;
 static unsigned char ind_val = 0;
 static unsigned char ind_num = 0;
 static unsigned char ind_sen = 0;
@@ -54,6 +54,7 @@ unsigned char vendas(unsigned char tecla, char buffer[])
 			qual_venda = tecla - '0';
 			lcd_posicionar(1, 2);
 			lcd_caractere(tecla);
+			//n_vendas[ind_vds].data[] = "01012026"
 		}else if(tecla == 'D' && estado_venda == TIPO)
 			{
 				if(qual_venda == VENDA_VISTA) n_vendas[ind_vds].codigo = inc_cod++;
@@ -217,6 +218,12 @@ unsigned char vendas(unsigned char tecla, char buffer[])
 				if(estado_venda == SEN_CARTAO && tecla != 0)
 				{
 					if (ind_sen < 6 && tecla != 'D') {
+
+						/*if(!limpou_tela)
+						{
+							lcd_limpar();
+							limpou_tela =1;
+						}*/
 						n_vendas[ind_vds].senha_cartao[ind_sen] = tecla;
 						lcd_caractere('*');
 						ind_sen++;
@@ -245,6 +252,7 @@ unsigned char vendas(unsigned char tecla, char buffer[])
 					}else if (qual_venda == VENDA_PARCELADA)
 						{
 							enviar_venda_parcelada(n_vendas[ind_vds].bandeira, n_vendas[ind_vds].num_cartao, n_vendas[ind_vds].senha_cartao, n_vendas[ind_vds].num_parcelas, n_vendas[ind_vds].valor_venda);
+							n_vendas[ind_vds].data = mes;
 						}
 					qual_venda = 0;
 					ind_vds++;
@@ -305,4 +313,27 @@ unsigned char vendas(unsigned char tecla, char buffer[])
 				return 0;
 	}
 	return 0;
+}
+
+/*
+void func_test(){
+	n_vendas[0].num_parcelas = 3; 
+ n_vendas[0].tipo_venda = VENDA_PARCELADA;
+ strcpy(n_vendas[0].valor_venda, "100");
+
+ n_vendas[1].num_parcelas = 2; 
+ n_vendas[1].tipo_venda = VENDA_PARCELADA;
+ strcpy(n_vendas[1].valor_venda, "30");
+}*/
+
+void func_test(){
+    n_vendas[0].codigo = 1;  // ← faltava isso
+    n_vendas[0].num_parcelas = 3;
+    n_vendas[0].tipo_venda = VENDA_PARCELADA;
+    strcpy(n_vendas[0].valor_venda, "100");
+
+    n_vendas[1].codigo = 2;  // ← faltava isso
+    n_vendas[1].num_parcelas = 2;
+    n_vendas[1].tipo_venda = VENDA_PARCELADA;
+    strcpy(n_vendas[1].valor_venda, "30");
 }

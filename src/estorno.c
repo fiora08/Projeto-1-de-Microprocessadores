@@ -8,7 +8,8 @@
 #include "senhas.h"
 #include "serial.h"
 #include "maquina.h"
-
+#include "estorno.h"
+#include "energia.h"
 #define OPERADOR_NULO 255
 
 
@@ -54,12 +55,14 @@ unsigned char estorno_executar(usuario *lista_usuarios) {
 	lcd_posicionar(1, 0);
 
 	while (1) {
+		energia_gerenciar();
 		teclado_atualizar();
 		unsigned char resultado = mascara_autentica_senha(lista_usuarios, 4, &indice_op);
 
 		if (indice_op != OPERADOR_NULO) {
 			
 			while (1) {
+				energia_gerenciar();
 				teclado_atualizar();
 				if (teclado_obter_tecla() == 'D') break;
 			}
@@ -117,6 +120,7 @@ unsigned char estorno_executar(usuario *lista_usuarios) {
 		lcd_posicionar(1, 0);
 
 		while (1) {
+			energia_gerenciar();
 			teclado_atualizar();
 			tecla = teclado_obter_tecla();
 			if (tecla == 'D') break;
@@ -149,6 +153,7 @@ unsigned char estorno_executar(usuario *lista_usuarios) {
 		unsigned char opcao = 0;
 
 		while (1) {
+			energia_gerenciar();
 			teclado_atualizar();
 			tecla = teclado_obter_tecla();
 			if (tecla == '1' || tecla == '2') { opcao = tecla; break; }
@@ -161,6 +166,7 @@ unsigned char estorno_executar(usuario *lista_usuarios) {
 			lcd_posicionar(1, 0);
 
 			while (p < 6) {
+				energia_gerenciar();
 				teclado_atualizar();
 				tecla = teclado_obter_tecla();
 				if (tecla >= '0' && tecla <= '9') {
@@ -173,6 +179,7 @@ unsigned char estorno_executar(usuario *lista_usuarios) {
 			
 
 			while (1) {
+				energia_gerenciar();
 				teclado_atualizar();
 				if (teclado_obter_tecla() == 'D') break;
 			}
@@ -220,6 +227,7 @@ unsigned char estorno_executar(usuario *lista_usuarios) {
 	lcd_escrever_string("D P/ CONFIRMAR");
 
 	while (1) {
+		energia_gerenciar();
 		teclado_atualizar();
 		if (teclado_obter_tecla() == 'D') break;
 	}

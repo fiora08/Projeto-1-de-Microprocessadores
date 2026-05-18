@@ -6,7 +6,7 @@ static unsigned char estado_protocolo = IDLE;
 static unsigned char tipo_mensagem = 0;
 static unsigned char n;
 static unsigned char contador_payload = 0;
-static char mensagem[17];
+static char mensagem[16];
 unsigned char maquina_protocolo(){
 
     if(serial_disponivel()==1){
@@ -104,10 +104,10 @@ unsigned char maquina_protocolo(){
                 contador_payload++;
 
                 if (contador_payload>=n) {
-                    if (contador_payload < 15 ){
+                    if (contador_payload < 13) {
                         mensagem[3+contador_payload] = '\0';
                     }else {
-                        mensagem[17]= '\0'; // no pior dos casos se acabar nao chegando em 15, coloca \0 no final para conseguir ler 
+                        mensagem[15]= '\0'; // no pior dos casos se acabar nao chegando em 15, coloca \0 no final para conseguir ler 
                     }
                     
                     estado_protocolo =IDLE;
