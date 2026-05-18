@@ -56,6 +56,7 @@ void serial_escrever(const char* texto) {
 
 void serial_enviar_triplo(const char* comando, char *sucesso) {
 	*sucesso = 0; // inicia assumindo falha 
+	contador_timeout = 0;
 	for (int i = 0; i < 3; i++) { // loop das 3 tentativas 
 		serial_escrever(comando);  // envia um comando , estorno , venda , etc...
 		
@@ -66,13 +67,18 @@ void serial_enviar_triplo(const char* comando, char *sucesso) {
 			if (serial_disponivel()) { // se o servidor responder 
 				*sucesso = 1; // deu certo 
 				erro_com_flag = 0; // limpa o erro 
+				fora_do_ar_flag = 0;
 				return; // sai da fun��o 
-			}
-			// verifica��o em tempo real : se o tempo durar mais de 2 minutos 
-			if (contador_timeout >= 120000) {
-				fora_do_ar_flag = 1; // liga o alarme
-			}
+				}
+		if(contador_timeout>=5000){
+			fora_do_ar_flag = 1;
+			erro_com_flag = 1;
+			return;
 		}
-	}    
+			 
+			}
+
+		} 
+	fora_do_ar_flag = 1;
 	erro_com_flag = 1; // se saiu do loop de 3 tentativas servidor falhou
 	}

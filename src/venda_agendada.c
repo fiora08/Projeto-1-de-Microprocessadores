@@ -72,10 +72,13 @@ void listar_parcelas()
     }
 }*/
 
-void verificar_parcelas(void) {
+unsigned char verificar_parcelas() {
     static unsigned char ja_tentou_12h = 0;
     static unsigned char ja_tentou_18h = 0;
     static unsigned char ja_tentou_22h = 0;
+    static int parc_quit = 0;
+    static int state_send = 0;
+    static int resposta = 1;
 
     if (h != 12) ja_tentou_12h = 0;
     if (h != 18) ja_tentou_18h = 0;
@@ -84,36 +87,86 @@ void verificar_parcelas(void) {
     if ((h == 12 && !ja_tentou_12h) ||
         (h == 18 && !ja_tentou_18h) ||
         (h == 22 && !ja_tentou_22h)) {
-            func_test(); 
+            //func_test(); 
         qtd_parcelas = 0; // reseta a lista antes de popular
-
+        parc_quit = 0;
+        //(strcmp(protocolo_get_mensagem(), "SAP") == 0)
         for (int i = 0; i < 5; i++) {
-            if (n_vendas[i].tipo_venda == VENDA_PARCELADA) {
+            //if (n_vendas[i].tipo_venda == VENDA_PARCELADA)
+            serial_transmitir(n_vendas[i].codigo);
+            if (n_vendas[i].tipo_venda == VENDA_PARCELADA && (mes-n_vendas[i].data == 1 || mes-n_vendas[i].data < 0)) {
                 ind_parcelas[qtd_parcelas] = i;
                 qtd_parcelas++;
-        //lcd_posicionar(1, 0);
-        //lcd_caractere(qtd_parcelas);
-                enviar_agendamento(n_vendas[i].bandeira,
+                if(!state_send){
+                    enviar_agendamento(n_vendas[i].bandeira,
                                    (char *)n_vendas[i].num_cartao,
                                    (char *)n_vendas[i].valor_venda);
-
-                if (maquina_protocolo() == 1) {
+                    resposta = 0;
+                    state_send = 1;
+                }
+                
+                while(!resposta){
+                    if (maquina_protocolo() == 1) {
                     char *msg = protocolo_get_mensagem();
                     if (msg[2] != 'P') {
-                        if (n_vendas[i].num_parcelas > 0) {
+                        if (n_vendas[i].num_parcelas > 0 && msg[2] == 'N') {
                         PORTB |= (1 << LED_pagamento_pendente);
-                            if (strcmp(protocolo_get_mensagem(), "SAP") == 0)
-                                n_vendas[i].num_parcelas--;
+                        lcd_limpar();
+        				lcd_posicionar(0, 1);
+        				lcd_escrever_string("Pagamento nao");
+        				lcd_posicionar(1, 3);
+        				lcd_escrever_string("localizado!");
+                        atraso_ms(500);
+                        //lcd_limpar();
+                        resposta = 1;
+                        state_send = 0;
+                        //return 1;
+                        }else{
+        					lcd_posicionar(0, 0);
+        					lcd_escrever_string("Cartao com falha");
+							lcd_posicionar(1, 3);
+        					lcd_escrever_string("(invalida)");  
+                        atraso_ms(500);
+                        //lcd_limpar();
+                            resposta = 1;
+                            state_send = 0;
+                            //return 1;
+                        }                       
+                    }else if((strcmp(protocolo_get_mensagem(), "SAP") == 0)){
+                        n_vendas[i].data = mes; 
+                        n_vendas[i].num_parcelas--;
+                        if(n_vendas[i].num_parcelas == 0){
+                            n_vendas[i].tipo_venda = VENDA_QUITADA; 
                         }
+        				lcd_posicionar(0, 4);
+        				lcd_escrever_string("Pagamento");
+        				lcd_posicionar(1, 4);
+        				lcd_escrever_string("efetivado");
+                        atraso_ms(500);
+                        //lcd_limpar();
+                            resposta = 1;
+                            state_send = 0;
+                            //return 1;
                     }
                 }
+                }
+                lcd_limpar();
             }
+        }
+        for (int j = 0; j < 5; j++){
+            if(n_vendas[j].tipo_venda == VENDA_PARCELADA && n_vendas[j].num_parcelas != 0){
+                 parc_quit = 1;
+            }
+        }
+        if (parc_quit == 0){
+            PORTB &= ~(1 << LED_pagamento_pendente);       
         }
 
         if (h == 12) ja_tentou_12h = 1;
         if (h == 18) ja_tentou_18h = 1;
         if (h == 22) ja_tentou_22h = 1;
     }
+    return 1;
 }
 /*
 void listar_parcelas(void) {
@@ -171,14 +224,14 @@ void listar_parcelas() {
         lcd_posicionar(0, 0);
         sprintf(buf, "Cod:%-2d  Parc:%-2d",
                 n_vendas[ind_parcelas[j]].codigo,
-                n_vendas[ind_parcelas[j]].num_parcelas);
+                n_vendas[ind_parcelas[j]].num_parcelas-'0');
         lcd_escrever_string(buf);
 
         if (j + 1 < qtd_parcelas) {
             lcd_posicionar(1, 0);
             sprintf(buf, "Cod:%-2d  Parc:%-2d",
                     n_vendas[ind_parcelas[j+1]].codigo,
-                    n_vendas[ind_parcelas[j+1]].num_parcelas);
+                    n_vendas[ind_parcelas[j+1]].num_parcelas-'0');
             lcd_escrever_string(buf);
         }
 

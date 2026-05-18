@@ -113,11 +113,11 @@ void mostrar_hora(){// // converte inteiro para char somando com '0' (ASCII 48),
 }
 
 void mostrar_data(){
-    lcd_caractere('0'+ mes/10);
-    lcd_caractere('0'+ mes%10);
-    lcd_caractere(':');
     lcd_caractere('0'+ dia/10);
-    lcd_caractere('0'+dia%10);
+    lcd_caractere('0'+ dia%10);
+    lcd_caractere(':');
+    lcd_caractere('0'+ mes/10);
+    lcd_caractere('0'+mes%10);
 }
 
 

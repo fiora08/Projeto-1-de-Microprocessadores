@@ -14,6 +14,7 @@
 #define CREDITO 11
 #define ENVIAR 12
 #define RESPOSTA 13
+#define VENDA_QUITADA 13
 
 
 typedef struct venda {

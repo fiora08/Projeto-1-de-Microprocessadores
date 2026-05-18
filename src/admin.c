@@ -26,6 +26,7 @@ unsigned char menu_admin(unsigned char tecla, usuario *usuarios) {
     static unsigned char mostrando_msg = 0;
     static unsigned char no_menu = 0;
     static unsigned char entrou_menu_hora = 0;
+    static unsigned char entrou_menu_data = 0;
     static unsigned char entrou_menu_pendencias = 0;
     
     if (mostrando_msg) {
@@ -51,7 +52,7 @@ unsigned char menu_admin(unsigned char tecla, usuario *usuarios) {
                     tecla = 0; // zera aqui
                 }
             }
-            if (modo_edicao == 2 && tecla != '#') { // só processa minuto se não for '#'
+           if (modo_edicao == 2 && tecla != '#') { // só processa minuto se não for '#'
                 if (alterar_minuto(tecla)){ 
                     modo_edicao = 1;
                     entrou_menu_hora = 0;
@@ -61,10 +62,43 @@ unsigned char menu_admin(unsigned char tecla, usuario *usuarios) {
 
             if (seg != ultimo_seg) {
                 ultimo_seg = seg;
+                //no_menu = 0 ;
                 lcd_posicionar(0, 0);
                 mostrar_hora();
                 lcd_posicionar(1, 0);
-                mostrar_data();                
+                mostrar_data();   
+                 //entrou_menu_hora = 0;             
+            }
+            return 0;
+    
+    }
+
+    if (entrou_menu_data) {
+        static unsigned char modo_edicao = 1;
+        static int ultimo_seg = -1;
+        
+        //teclado_atualizar();
+        //tecla = teclado_obter_tecla();
+
+            if (modo_edicao == 1) {
+                if (alterar_dia(tecla)) {
+                    modo_edicao = 2;
+                    lcd_limpar();
+                    tecla = 0; // zera aqui
+                }
+            }
+            if (modo_edicao == 2 && tecla != '#') { // só processa minuto se não for '#'
+                if (alterar_mes(tecla)){ 
+                    modo_edicao = 1;
+                    entrou_menu_data = 0;
+                    no_menu = 0 ;
+                }
+            }
+
+            if (seg != ultimo_seg) {
+                ultimo_seg = seg;
+                lcd_posicionar(0, 0);
+                mostrar_data();
             }
             return 0;
     
@@ -74,7 +108,7 @@ unsigned char menu_admin(unsigned char tecla, usuario *usuarios) {
         lcd_limpar();
         lcd_escrever_string("1-OP0 2-OP1 3-HR");
         lcd_posicionar(1, 0);
-        lcd_escrever_string("4-PEND 5-PEND/");
+        lcd_escrever_string("4-PD 5-PD/ 6-DT");
         no_menu = 1;
     }
     switch (tecla) {
@@ -115,12 +149,16 @@ unsigned char menu_admin(unsigned char tecla, usuario *usuarios) {
        entrou_menu_pendencias = 1;
        lcd_limpar();
        tecla=0;
-       verificar_parcelas();
+       //verificar_parcelas();
        listar_parcelas();
        break;
 
-       case '5':
-       break;
+       case '6':
+        //alteração de data
+       entrou_menu_data = 1;
+       lcd_limpar();
+       tecla=0;
+       break; 
         }
     if (tecla == '*') {
         no_menu = 0;

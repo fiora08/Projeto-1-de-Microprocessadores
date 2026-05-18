@@ -75,6 +75,17 @@ int main(void) {
 while (1) {
         energia_gerenciar();
         maquina_login(novo_usuario, &usuario_autenticado);
+        //verificar_parcelas();
+        if(verificar_parcelas() == 1){
+                   
+                    menu_estado = MENU_PRINCIPAL;
+                    menu_desenhado = 0;					
+				}
+        if (fora_do_ar_flag == 1) {
+            PORTB |= (1 << LED_fora_do_ar);   // Liga o led
+        } else {
+            PORTB &= ~(1 << LED_fora_do_ar);  // Apaga o led
+        }
 
         if (estado_atual == DESBLOQUEADO && sistema_ja_ligado == 4) {
             teclado_atualizar();
@@ -91,7 +102,18 @@ while (1) {
                     strcpy(buffer, msg);
                 }
             }
-
+            if (usuario_autenticado!=2 && !novo_usuario[usuario_autenticado].habilitado) {
+                if (!menu_desenhado) {
+                    lcd_limpar();
+                    lcd_escrever_string("OPERADOR BLOQ.");
+                    menu_desenhado=1;
+                    atraso_ms(500);
+                    lcd_limpar();
+                    sistema_ja_ligado = 1;
+                    estado_atual = BLOQUEADO;
+                
+                }
+            }
          //menu conjunto
             if (menu_estado == MENU_PRINCIPAL) {
                 if (!menu_desenhado) {
