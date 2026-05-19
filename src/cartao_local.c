@@ -256,9 +256,9 @@ unsigned char venda_local(cartao_local1 *cartoes, unsigned char num_cartoes){
         else
             valor = 0;
         cartoes[indice].cashback_disponivel = 0;
-        lcd_limpar();
-        lcd_escrever_string("CASHBACK -20");
-        atraso_ms(1500);
+        //lcd_limpar();
+        //lcd_escrever_string("CASHBACK -20");
+        //atraso_ms(1500);
     }
 
     // SALDO
@@ -292,6 +292,10 @@ unsigned char venda_local(cartao_local1 *cartoes, unsigned char num_cartoes){
 
     lcd_limpar();
     lcd_escrever_string("VENDA APROV.");
+    lcd_posicionar(1, 0);
+    lcd_escrever_string("SALDO:");
+    //char aux = cartoes[indice].saldo;
+    lcd_escrever_string(buffer);
 
     atraso_ms(1500);
     lcd_limpar();

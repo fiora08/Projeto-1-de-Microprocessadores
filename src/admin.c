@@ -153,6 +153,28 @@ unsigned char menu_admin(unsigned char tecla, usuario *usuarios) {
        listar_parcelas();
        break;
 
+       case'5':
+            lcd_limpar();
+            lcd_escrever_string("COD. VENDA:");
+            lcd_posicionar(1, 0);
+            // lê o código pelo teclado
+            unsigned int cod = 0;
+            unsigned char t;
+            while(1) {
+                teclado_atualizar();
+                t = teclado_obter_tecla();
+                if (t >= '0' && t <= '9') {
+                    cod = (cod * 10) + (t - '0');
+                    lcd_caractere(t);
+                }
+                if (t == 'D') break;
+            }
+            desabilitar_parcela(cod);
+            mostrando_msg = 1;
+            lcd_limpar();
+            lcd_escrever_string("DESABILITADO");
+            break;
+            
        case '6':
         //alteração de data
        entrou_menu_data = 1;

@@ -240,3 +240,13 @@ void listar_parcelas() {
 
     lcd_limpar();
 }
+
+void desabilitar_parcela(unsigned int codigo) {
+    for (int i = 0; i < 5; i++) {
+        if (n_vendas[i].codigo == codigo) {
+            n_vendas[i].pagamento_pendente = 1;
+            PORTB &= ~(1 << LED_pagamento_pendente);
+            return;
+        }
+    }
+}

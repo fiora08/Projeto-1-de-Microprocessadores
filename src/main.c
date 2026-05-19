@@ -154,10 +154,10 @@ while (1) {
 
                 if (tecla == '4') {
                     num_cartoes = cadastrar_cartao_local(cartao_local, num_cartoes);
-                    serial_escrever(cartao_local[num_cartoes-1].numero_cartao);
+                    /*serial_escrever(cartao_local[num_cartoes-1].numero_cartao);
                     serial_escrever(" ");
                     serial_escrever(cartao_local[num_cartoes-1].senha_cartao);
-                    serial_escrever(" saldo");
+                    serial_escrever(" saldo");*/
                     
                     menu_estado = MENU_PRINCIPAL;
                     menu_desenhado = 0;
@@ -165,10 +165,11 @@ while (1) {
 
                 if(tecla == '5'){
 
-                    venda_local(
-                        cartao_local,
-                        num_cartoes);
-                        menu_estado = MENU_PRINCIPAL;
+				    if(venda_local(cartao_local, num_cartoes) == 1){
+                    atraso_ms(1500);
+                    menu_estado = MENU_PRINCIPAL;
+                    menu_desenhado = 0;					
+				    }
                 }                
             }
 

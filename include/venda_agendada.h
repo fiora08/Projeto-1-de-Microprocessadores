@@ -3,5 +3,6 @@
 
 void verificar_parcelas(void);
 void listar_parcelas();
+void desabilitar_parcela(unsigned int codigo);
 
 #endif

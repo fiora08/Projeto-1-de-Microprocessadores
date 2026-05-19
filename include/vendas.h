@@ -27,6 +27,7 @@ typedef struct venda {
     unsigned char senha_cartao[7];
     unsigned int codigo;
     unsigned int data;
+    unsigned int pagamento_pendente;
 } venda;
 
 extern venda n_vendas[5];
